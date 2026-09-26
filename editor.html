@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FreeTikZ drawing editor</title>
+    <link rel="stylesheet" href="css/editor.css">
+    <script type="module" src="js/editor.js"></script>
+  </head>
+  <body>
+    <main class="editor">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">ƒ</span>
+          <div>
+            <h1>FreeTikZ</h1>
+            <p>Mathematical drawing editor</p>
+          </div>
+        </div>
+        <div class="file-actions">
+          <button id="open-scene" type="button">Open scene</button>
+          <button id="save-scene" type="button">Save scene</button>
+          <input id="scene-file" type="file" accept="application/json,.json" hidden>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <section class="drawing" aria-label="Drawing canvas">
+          <div class="tool-row" role="toolbar" aria-label="Drawing tools">
+            <button type="button" data-tool="select" aria-pressed="false">Select</button>
+            <button type="button" data-tool="ink" aria-pressed="true">Draw</button>
+            <button type="button" data-tool="point" aria-pressed="false">Point</button>
+            <button type="button" data-tool="segment" aria-pressed="false">Line</button>
+            <button type="button" data-tool="circle" aria-pressed="false">Circle</button>
+            <button type="button" data-tool="label" aria-pressed="false">TeX label</button>
+            <input id="label-tex" type="text" aria-label="TeX label" value="$x$" hidden>
+            <button id="remove-selection" type="button" disabled>Delete selected</button>
+          </div>
+          <div class="canvas-wrap">
+            <svg id="canvas" xmlns="http://www.w3.org/2000/svg" aria-label="Figure" tabindex="0">
+              <g id="scene-content"></g>
+              <g id="interaction-overlay"></g>
+            </svg>
+          </div>
+          <div class="status-row">
+            <span id="status">Draw a stroke or choose a geometric tool.</span>
+            <span id="object-count">0 objects</span>
+          </div>
+        </section>
+
+        <aside class="preview" aria-label="Figure preview and TikZ source">
+          <div class="panel-heading">
+            <div>
+              <h2>Figure preview</h2>
+              <p>Scene objects stay editable.</p>
+            </div>
+            <span id="scene-state" class="state-label">Saved locally</span>
+          </div>
+          <div class="preview-surface">
+            <svg id="preview-canvas" xmlns="http://www.w3.org/2000/svg" aria-label="Figure preview"></svg>
+          </div>
+          <div class="source-heading">
+            <h2>TikZ source</h2>
+            <button id="copy-tikz" type="button">Copy</button>
+          </div>
+          <textarea id="tikz-source" aria-label="TikZ source" spellcheck="false" readonly></textarea>
+          <p class="source-note">The scene generates this draft. Source editing is a separate stage.</p>
+        </aside>
+      </div>
+    </main>
+  </body>
+</html>
