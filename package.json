@@ -1,0 +1,16 @@
+{
+  "name": "@dzackgarza/freetikz",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./scene": {
+      "types": "./js/scene.d.ts",
+      "default": "./js/scene.js"
+    },
+    "./tikz": {
+      "types": "./js/tikz.d.ts",
+      "default": "./js/tikz.js"
+    }
+  }
+}
