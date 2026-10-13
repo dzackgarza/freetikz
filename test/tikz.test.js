@@ -2,6 +2,18 @@ import { expect, test } from 'bun:test'
 import { addPrimitive, addStroke, createScene, serializeScene, setInterpretation } from '../js/scene.js'
 import { generateTikz } from '../js/tikz.js'
 
+test('captured geometry and later standard TikZ paths share one physical coordinate plane', () => {
+  const scene = createScene()
+  addPrimitive(scene, { kind: 'segment', start: { x: 28.4527559, y: 56.9055118 }, end: { x: 56.9055118, y: 56.9055118 } })
+  const source = generateTikz(scene).source
+
+  // A visual editor adds paths using TikZ's default 1 cm right/up basis.
+  // The captured segment must land at (1,-2) through (2,-2) in that basis.
+  expect(source).toContain('\\begin{tikzpicture}\n')
+  expect(source).toContain('\\coordinate (o1-start) at (1,-2);')
+  expect(source).toContain('\\coordinate (o1-end) at (2,-2);')
+})
+
 test('scene primitives emit named, editable standard TikZ without changing the scene', () => {
   const scene = createScene()
   addPrimitive(scene, { kind: 'point', x: 5, y: 7 })
@@ -12,15 +24,15 @@ test('scene primitives emit named, editable standard TikZ without changing the s
 
   expect(generateTikz(scene)).toEqual({
     source: [
-      '\\begin{tikzpicture}[x=1pt,y=-1pt]',
-      '  \\coordinate (o1) at (5,7);',
+      '\\begin{tikzpicture}',
+      '  \\coordinate (o1) at (0.1757,-0.246);',
       '  \\fill (o1) circle[radius=1.5pt];',
-      '  \\coordinate (o2-start) at (5,7);',
-      '  \\coordinate (o2-end) at (30,7);',
+      '  \\coordinate (o2-start) at (0.1757,-0.246);',
+      '  \\coordinate (o2-end) at (1.0544,-0.246);',
       '  \\draw (o2-start) -- (o2-end);',
-      '  \\coordinate (o3-center) at (40,20);',
+      '  \\coordinate (o3-center) at (1.4058,-0.7029);',
       '  \\draw (o3-center) circle[radius=8pt];',
-      '  \\node (o4) at (10,4) {$\\operatorname{Exc}(\\pi)$};',
+      '  \\node (o4) at (0.3515,-0.1406) {$\\operatorname{Exc}(\\pi)$};',
       '\\end{tikzpicture}',
       ''
     ].join('\n'),
@@ -43,11 +55,11 @@ test('raw ink emits a reduced polyline while an interpreted stroke emits its geo
   })
 
   expect(generateTikz(scene).source).toBe([
-    '\\begin{tikzpicture}[x=1pt,y=-1pt]',
+    '\\begin{tikzpicture}',
     '  \\coordinate (o1-start) at (0,0);',
-    '  \\draw (o1-start) -- (20,0) -- (40,20);',
-    '  \\coordinate (o2-start) at (2,50);',
-    '  \\coordinate (o2-end) at (22,50);',
+    '  \\draw (o1-start) -- (0.7029,0) -- (1.4058,-0.7029);',
+    '  \\coordinate (o2-start) at (0.0703,-1.7573);',
+    '  \\coordinate (o2-end) at (0.7732,-1.7573);',
     '  \\draw (o2-start) -- (o2-end);',
     '\\end{tikzpicture}',
     ''
@@ -61,6 +73,6 @@ test('source does not expose pointer-coordinate noise', () => {
     start: { x: 1.23456789, y: 2.00000001 },
     end: { x: 20.98765432, y: 2.00000001 }
   })
-  expect(generateTikz(scene).source).toContain('at (1.23,2);')
-  expect(generateTikz(scene).source).toContain('at (20.99,2);')
+  expect(generateTikz(scene).source).toContain('at (0.0434,-0.0703);')
+  expect(generateTikz(scene).source).toContain('at (0.7376,-0.0703);')
 })

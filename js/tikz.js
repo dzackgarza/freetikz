@@ -4,7 +4,15 @@ function number (value) {
 }
 
 function coordinate (point) {
-  return `(${number(point.x)},${number(point.y)})`
+  // Scene positions are screen-oriented TeX points; standard TikZ coordinates
+  // use centimeters to the right and upward. Keep enough precision that a
+  // captured point does not visibly move when an editor adds a path beside it.
+  const pointsPerCentimeter = 72.27 / 2.54
+  const centimeter = value => {
+    const rounded = Number((value / pointsPerCentimeter).toFixed(4))
+    return String(Object.is(rounded, -0) ? 0 : rounded)
+  }
+  return `(${centimeter(point.x)},${centimeter(-point.y)})`
 }
 
 // Ramer-Douglas-Peucker reduction follows Simplify.js's distance-based
@@ -99,7 +107,7 @@ function emitObject (object) {
 }
 
 export function generateTikz (scene) {
-  const lines = ['\\begin{tikzpicture}[x=1pt,y=-1pt]']
+  const lines = ['\\begin{tikzpicture}']
   for (const object of scene.objects) lines.push(...emitObject(object))
   lines.push('\\end{tikzpicture}')
   return { source: `${lines.join('\n')}\n`, libraries: [] }
